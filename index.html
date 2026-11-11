@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMPEREUR NOCTAMBULE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Courier New',monospace}
+body{background:#000;color:#00ff41;overflow:hidden}
+.screen{width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative}
+.hidden{display:none!important}
+/* FOND COUVERTURE */
+#lockScreen{
+  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.85)), url('cover.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.bg{position:fixed;inset:0;background:radial-gradient(circle at 50% 20%,#1a0033,#000 70%);z-index:-1}
+.logo{font-size:42px;text-align:center;color:#fff;text-shadow:0 0 20px #a855f7, 0 0 40px #000}
+.logo span{color:#a855f7}
+.sub{color:#fff;margin:10px 0 20px;font-size:12px;text-align:center;text-shadow:0 0 10px #000}
+.code-box{display:flex;gap:10px;margin:15px 0}
+.code-box input{width:55px;height:60px;background:rgba(0,0,0,.7);border:2px solid #a855f7;color:#fff;font-size:28px;text-align:center;border-radius:10px}
+.btn{background:#a855f7;color:#fff;border:none;padding:14px 25px;font-weight:bold;border-radius:10px;cursor:pointer;width:100%;font-size:16px}
+.btn-red{background:#ff0000;box-shadow:0 0 20px #ff0000}
+.small{font-size:11px;color:#ddd;margin-top:15px;text-align:center;text-shadow:0 0 10px #000}
+.header{width:100%;display:flex;justify-content:space-between;align-items:center}
+.header b{color:#fff;font-size:14px}
+.header small{color:#ff0000}
+.card{width:100%;max-width:420px;background:rgba(10,0,20,.92);border:1px solid #a855f7;border-radius:15px;padding:15px;margin-top:15px}
+label{font-size:12px;color:#aaa}
+input[type=text],input[type=tel]{width:100%;padding:12px;margin:6px 0 12px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;font-size:16px}
+#log{height:280px;overflow-y:auto;background:#000;border:1px solid #222;padding:10px;font-size:12px;margin-top:12px;border-radius:10px}
+.log-line{margin:2px 0;white-space:nowrap}
+.final{color:#ff0000;font-size:22px;text-align:center;font-weight:bold;text-shadow:0 0 15px red;margin-top:10px}
+.support{font-size:10px;color:#666;margin-top:10px;line-height:1.5;text-align:center}
+.admin-btn{position:absolute;bottom:5px;right:8px;color:#111;font-size:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<!-- ECRAN VERROUILLAGE AVEC COUVERTURE -->
+<div id="lockScreen" class="screen">
+  <div class="logo">🌙👑<br>EMPEREUR<br><span>NOCTAMBULE</span> ♾️</div>
+  <div class="sub">SIMULATION - ACCÈS RESTREINT<br>ENTREZ LE CODE À 4 CHIFFRES</div>
+  <div class="code-box">
+    <input maxlength="1" id="c1" inputmode="numeric"><input maxlength="1" id="c2" inputmode="numeric"><input maxlength="1" id="c3" inputmode="numeric"><input maxlength="1" id="c4" inputmode="numeric">
+  </div>
+  <button class="btn" onclick="checkCode()">DÉVERROUILLER ⚔️</button>
+  <div class="small">EMPEREUR NOCTAMBULE ♾️⚔️👑📵☠️🌙<br>PROTOCOLE NOIR - VERSION SIMULATION FAKE</div>
+</div>
+
+<!-- ADMIN DIEU -->
+<div id="adminScreen" class="screen hidden">
+  <h2 style="color:#fff">⚙️ PARAMÈTRE ADMIN DIEU</h2>
+  <p style="font-size:12px;margin:10px">Toi seul as accès ici Empereur.</p>
+  <div class="card">
+    <label>NOUVEAU CODE D'ACCÈS (4 chiffres)</label>
+    <input type="tel" id="newCode" maxlength="4" placeholder="Ex: 2410">
+    <button class="btn" onclick="saveCode()">SAUVEGARDER LE CODE</button>
+    <button class="btn" style="background:#333;margin-top:10px" onclick="backToLock()">RETOUR</button>
+  </div>
+</div>
+
+<!-- ECRAN PRINCIPAL -->
+<div id="mainScreen" class="screen hidden" style="justify-content:flex-start">
+  <div class="header"><b>⚫ LANCEMENT DE PROTOCOL NOIR</b><small>● LIVE</small></div>
+  <div class="card">
+    <label>NUMÉRO DE LA CIBLE</label>
+    <input type="tel" id="numero" placeholder="241 06 XX XX XX">
+    <label>NOM DE LA CIBLE</label>
+    <input type="text" id="nom" placeholder="Nom de la cible">
+    <button class="btn btn-red" onclick="lancerRapport()">LANCER LE RAPPORT EMPEREUR NOCTAMBULE ⚔️☠️</button>
+    <div id="log"></div>
+    <div id="final" class="final"></div>
+    <div class="support">SUPPORT WHATSAPP :<br>support@whatsapp.com • android@support.whatsapp.com<br>iphone@support.whatsapp.com • web@support.whatsapp.com<br>business@support.whatsapp.com • smb@support.whatsapp.com</div>
+  </div>
+  <div class="admin-btn" onclick="openAdmin()">.</div>
+</div>
+
+<script>
+let userCode = localStorage.getItem('empereurCode') || '2410';
+let adminCode = '9999';
+['c1','c2','c3','c4'].forEach((id,i,arr)=>{
+  document.getElementById(id).addEventListener('input',e=>{
+    if(e.target.value && i<3) document.getElementById(arr[i+1]).focus();
+  });
+});
+function checkCode(){
+  let code = document.getElementById('c1').value+document.getElementById('c2').value+document.getElementById('c3').value+document.getElementById('c4').value;
+  if(code===adminCode){
+    document.getElementById('lockScreen').classList.add('hidden');
+    document.getElementById('adminScreen').classList.remove('hidden');
+  } else if(code===userCode){
+    document.getElementById('lockScreen').classList.add('hidden');
+    document.getElementById('mainScreen').classList.remove('hidden');
+  } else { alert('CODE INCORRECT - ACCÈS REFUSÉ'); }
+}
+function saveCode(){
+  let n=document.getElementById('newCode').value;
+  if(n.length!==4){alert('Mets 4 chiffres');return;}
+  localStorage.setItem('empereurCode',n); userCode=n; alert('Code changé en : '+n); backToLock();
+}
+function backToLock(){
+  document.getElementById('adminScreen').classList.add('hidden');
+  document.getElementById('lockScreen').classList.remove('hidden');
+}
+function openAdmin(){
+  document.getElementById('mainScreen').classList.add('hidden');
+  document.getElementById('adminScreen').classList.remove('hidden');
+}
+function lancerRapport(){
+  let num=document.getElementById('numero').value || '241XXXXXXX';
+  let nom=document.getElementById('nom').value || 'CIBLE';
+  let log=document.getElementById('log');
+  let final=document.getElementById('final');
+  log.innerHTML=''; final.innerHTML='';
+  let i=1;
+  let interval=setInterval(()=>{
+    let div=document.createElement('div');
+    div.className='log-line';
+    div.textContent='['+i+'/500] RAPPORT BAN '+num+' - '+nom+' - SIGNALEMENT ENVOYÉ ⚔️';
+    log.appendChild(div);
+    log.scrollTop=log.scrollHeight;
+    i++;
+    if(i>500){
+      clearInterval(interval);
+      final.innerHTML='☠️ BANNi '+num+' ☠️<br>'+nom+' TERMINÉ';
+      navigator.vibrate && navigator.vibrate([200,100,200]);
+    }
+  },18);
+}
+</script>
+</body>
+</html>
